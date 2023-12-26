@@ -7,7 +7,6 @@ export interface AvaliacaoType {
     id: string;
     disciplina: string;
     nota: number,
-    loading?: boolean,
     aluno: {
         id: string,
         nome: string,
@@ -15,19 +14,15 @@ export interface AvaliacaoType {
     }
 }
 
-const initialState: AvaliacaoType[] = [
-    {
-        id: '',
-        disciplina: '',
-        nota: 0,
-        loading: false,
-        aluno: {
-            id: '',
-            nome: '',
-            type: ''
-        }
-    }
-]
+interface AvaliacaoState {
+    data: AvaliacaoType[],
+    loading: boolean
+}
+
+const initialState: AvaliacaoState = {
+    data: [],
+    loading: false
+}
 
 export const editAvaliacao = createAsyncThunk('edit/avaliacao', async (data: AvaliacaoType, { getState }) => {
     const stateLogged = getState() as { alunoLogin: AlunoType | undefined }
@@ -103,10 +98,12 @@ const avaliacaoSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(listAvaliacoes.pending, (state) => {
+            state.loading = true
             return state
         });
         builder.addCase(listAvaliacoes.fulfilled, (state, action) => {
-            state = action.payload || initialState;
+            state.loading = false
+            state.data = action.payload || initialState;
             return state
         });
         builder.addCase(listAvaliacoes.rejected, (_, action) => {
