@@ -10,7 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { Alert, Button, Snackbar, Typography } from '@mui/material';
+import { Alert, Button, CircularProgress, Snackbar, Typography } from '@mui/material';
 import { listAvaliacoes } from '../store/modules/avaliacao/avaliacaoSlice';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -51,45 +51,49 @@ function TableAvaliacoes() {
   }
 
   useEffect(() => {
-    if (!avaliacoesRedux) {
+    if (!avaliacoesRedux.data) {
       return setAlert('Nenhuma avaliação para listar')
     }
     dispatch(listAvaliacoes())
   }, []);
 
   return (
-    <><TableContainer component={Paper}>
-      <Table sx={{ minWidth: 700 }} aria-label="customized table">
-        <TableHead>
-          <TableRow>
-            <StyledTableCell align="left">id Avaliação</StyledTableCell>
-            <StyledTableCell align="right">Disciplina</StyledTableCell>
-            <StyledTableCell align="right">Nota</StyledTableCell>
-            <StyledTableCell align="left">id Aluno</StyledTableCell>
-            <StyledTableCell align="left">Avaliação do Aluno</StyledTableCell>
-            <StyledTableCell align="right">Tipo</StyledTableCell>
-            <StyledTableCell align="center">Ação</StyledTableCell>
-            <StyledTableCell align="center">Ação</StyledTableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {avaliacoesRedux.length ? avaliacoesRedux.map((item) => (
-            <StyledTableRow key={item.id}>
-              <StyledTableCell component="th" scope="row">
-                {item.id}
-              </StyledTableCell>
-              <StyledTableCell align="right">{item.disciplina}</StyledTableCell>
-              <StyledTableCell align="right">{item.nota}</StyledTableCell>
-              <StyledTableCell align="right">{item.aluno.id}</StyledTableCell>
-              <StyledTableCell align="right">{item.aluno.nome}</StyledTableCell>
-              <StyledTableCell align="right">{item.aluno.type}</StyledTableCell>
-              <StyledTableCell align="center"><Button variant='contained' onClick={showAlertAuthorization} color='success'>Editar</Button></StyledTableCell>
-              <StyledTableCell align="center"><Button variant='contained' onClick={showAlertAuthorization} color='error'>Deletar</Button></StyledTableCell>
-            </StyledTableRow>
-          )) : <Typography>{alert}</Typography>}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <>
+      {avaliacoesRedux.loading ?
+        <CircularProgress /> :
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell align="left">id Avaliação</StyledTableCell>
+                <StyledTableCell align="right">Disciplina</StyledTableCell>
+                <StyledTableCell align="right">Nota</StyledTableCell>
+                <StyledTableCell align="left">id Aluno</StyledTableCell>
+                <StyledTableCell align="left">Avaliação do Aluno</StyledTableCell>
+                <StyledTableCell align="right">Tipo</StyledTableCell>
+                <StyledTableCell align="center">Ação</StyledTableCell>
+                <StyledTableCell align="center">Ação</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {avaliacoesRedux.data ? avaliacoesRedux.data.map((item) => (
+                <StyledTableRow key={item.id}>
+                  <StyledTableCell component="th" scope="row">
+                    {item.id}
+                  </StyledTableCell>
+                  <StyledTableCell align="right">{item.disciplina}</StyledTableCell>
+                  <StyledTableCell align="right">{item.nota}</StyledTableCell>
+                  <StyledTableCell align="right">{item.aluno.id}</StyledTableCell>
+                  <StyledTableCell align="right">{item.aluno.nome}</StyledTableCell>
+                  <StyledTableCell align="right">{item.aluno.type}</StyledTableCell>
+                  <StyledTableCell align="center"><Button variant='contained' onClick={showAlertAuthorization} color='success'>Editar</Button></StyledTableCell>
+                  <StyledTableCell align="center"><Button variant='contained' onClick={showAlertAuthorization} color='error'>Deletar</Button></StyledTableCell>
+                </StyledTableRow>
+              )) : <Typography>{alert}</Typography>}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      }
       <Snackbar className='styleAlert' open={alertAuthorization} autoHideDuration={1900} onClose={() => setAlertAuthorization(false)}>
         <Alert variant='filled' onClose={() => setAlertAuthorization(false)} severity="error">
           "Você não tem autorização para editar ou deletar avaliações"
